@@ -3,7 +3,6 @@ const { listContacts, getContactById, deleteContact, createContact, updateContac
 const getAllContacts = async (req, res, next) => {
     try {
         const contacts = await listContacts();
-        console.log(contacts)
         res.json(contacts);
     } catch (error) {
         next(error)
@@ -12,7 +11,7 @@ const getAllContacts = async (req, res, next) => {
 
 const getContact = async (req, res, next) => {
     try{
-        const contact = await getContactById(req.params.id);
+        const contact = await getContactById(req.params.contactId);
         if (contact) {
             res.json(contact);
         } else {
@@ -34,29 +33,30 @@ const addContact = async (req, res, next) => {
 }
 
 const removeContact = async (req, res, next) => {
-    const { id } = req.params;
+    const { contactId } = req.params;
     try{
-        await deleteContact(id);
-        res.status(204).send({message: 'Task deleted'});
+        await deleteContact(contactId);
+        res.status(204).send({ message: 'Task deleted' });
     } catch (error) {
         next(error)
     }
 }
 
 const putContact = async (req, res, next) => {
-    const { id } = req.params;
+    const { contactId } = req.params;
     try{
-        const result = await updateContact({id, toUpdate: req.body, upsert: true});
+        const result = await updateContact({ contactId, toUpdate: req.body, upsert: true });
         res.json(result)
     } catch (error) {
         next(error)
     }
 }
 
+
 const patchContact = async (req, res, next) => {
-    const { id } = req.params;
+    const { contactId } = req.params;
     try {
-        const result = await updateContact({id, toUpdate: req.body})
+        const result = await updateContact({ contactId, toUpdate: req.body})
         if(!result) {
             next();
         } else {
@@ -66,6 +66,7 @@ const patchContact = async (req, res, next) => {
         next(error)
     }
 }
+
 
 
 module.exports = { getAllContacts, getContact, addContact, removeContact, putContact, patchContact }

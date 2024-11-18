@@ -1,14 +1,9 @@
 const express = require('express');
 const logger = require('morgan');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const contactsRouter = require('./routes/api/contacts');
-
 const app = express();
 
-require('dotenv').config();
-const { DB_HOST: urlDb } = process.env;
-const connection = mongoose.connect(urlDb);
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
 
@@ -30,17 +25,4 @@ app.use((err, req, res, next) => {
     }
 })
 
-const startServer = async () => {
-    try{
-        await connection;
-        console.log('Database connected');
-        app.listen(8000, () => {
-            console.log('Server started on http://localhost:8000');
-        });
-    } catch (err) {
-        console.log(err);
-        process.exit(1);
-    }
-}
-
-startServer();
+module.exports = app;

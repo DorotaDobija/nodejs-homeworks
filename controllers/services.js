@@ -5,7 +5,7 @@ const listContacts = () => {
 }
 
 const getContactById = (id) => {
-    return Contact.findById({_id: id})
+    return Contact.findOne({_id: id})
 }
 
 const createContact = ({ name, email, phone }) => {
@@ -20,7 +20,8 @@ const updateContact = ({ id, toUpdate, upsert = false }) => {
     return Contact.findByIdAndUpdate(
         { _id: id },
         { $set: toUpdate },
-        { new: true, runValidators: true, strict: 'throw', upsert})
+        { new: true, runValidators: true, strict: 'throw', upsert }
+    )
 
 }
 
