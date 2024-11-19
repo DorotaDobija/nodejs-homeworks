@@ -43,9 +43,10 @@ const removeContact = async (req, res, next) => {
 }
 
 const putContact = async (req, res, next) => {
-    const { contactId } = req.params;
+    const id = req.params.contactId;
+    console.log(id)
     try{
-        const result = await updateContact({ contactId, toUpdate: req.body, upsert: true });
+        const result = await updateContact({ id, toUpdate: req.body, upsert: true });
         res.json(result)
     } catch (error) {
         next(error)
@@ -54,9 +55,9 @@ const putContact = async (req, res, next) => {
 
 
 const patchContact = async (req, res, next) => {
-    const { contactId } = req.params;
+    const id  = req.params.contactId;
     try {
-        const result = await updateContact({ contactId, toUpdate: req.body})
+        const result = await updateContact({ id, toUpdate: req.body})
         if(!result) {
             next();
         } else {
