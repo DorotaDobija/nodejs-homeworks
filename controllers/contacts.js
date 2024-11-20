@@ -1,4 +1,4 @@
-const { listContacts, getContactById, deleteContact, createContact, updateContact } = require('./services');
+const { listContacts, getContactById, deleteContact, createContact, updateContact, updateStatusContact } = require('./services');
 
 const getAllContacts = async (req, res, next) => {
     try {
@@ -36,7 +36,7 @@ const removeContact = async (req, res, next) => {
     const { contactId } = req.params;
     try{
         await deleteContact(contactId);
-        res.status(204).send({ message: 'Task deleted' });
+        res.status(200).send({ message: 'Task deleted' });
     } catch (error) {
         next(error)
     }
@@ -44,7 +44,6 @@ const removeContact = async (req, res, next) => {
 
 const putContact = async (req, res, next) => {
     const id = req.params.contactId;
-    console.log(id)
     try{
         const result = await updateContact({ id, toUpdate: req.body, upsert: true });
         res.json(result)
@@ -55,13 +54,15 @@ const putContact = async (req, res, next) => {
 
 
 const patchContact = async (req, res, next) => {
-    const id  = req.params.contactId;
+    const id = req.params.contactId;
+    console.log(typeof req.body.favorite)
     try {
-        const result = await updateContact({ id, toUpdate: req.body})
-        if(!result) {
-            next();
-        } else {
-            res.json(result);
+        const result = await updateStatusContact({ id, favorite: req.body.favorite})
+        if(req.body.favorite === undefined) {
+            return res.status(400).send({ "message": "missing field favorite" });
+        }
+        else {
+            res.status(200).json(result);
         }
     } catch (error) {
         next(error)

@@ -23,5 +23,12 @@ const updateContact = async ({ id, toUpdate, upsert = false }) => {
         { new: true, runValidators: true, strict: 'throw', upsert }
     )
 }
+const updateStatusContact = async ({ id, favorite}) => {
+    return Contact.findByIdAndUpdate(
+        {_id: id},
+        { $set: { favorite } },
+        { new: true, runValidators: true, strict: 'throw'}
+    )
+}
 
-module.exports = { listContacts, getContactById, deleteContact, createContact, updateContact }
+module.exports = { listContacts, getContactById, deleteContact, createContact, updateContact, updateStatusContact}
