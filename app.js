@@ -1,10 +1,9 @@
-const express = require('express')
-const logger = require('morgan')
-const cors = require('cors')
+const express = require('express');
+const logger = require('morgan');
+const cors = require('cors');
+const contactsRouter = require('./routes/api/contacts');
+const app = express();
 
-const contactsRouter = require('./routes/api/contacts')
-
-const app = express()
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
 
@@ -15,15 +14,15 @@ app.use(express.json())
 app.use('/api/contacts', contactsRouter)
 
 app.use((req, res) => {
-  res.status(404).json({ message: 'Not found' })
+  res.status(404).json({ message: `Not found - ${req.path}` })
 })
 
 app.use((err, req, res, next) => {
-  res.status(500).json({ message: err.message })
+    if(err.name === 'ValidationError'){
+        return res.status(400).json({ message: err.message });
+    } else {
+        res.status(500).json({ message: err.message || 'Something went wrong' });
+    }
 })
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
-})
-
-module.exports = app
+module.exports = app;

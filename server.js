@@ -1,5 +1,18 @@
 const app = require('./app')
+const { connection } = require('./Db')
 
-app.listen(3000, () => {
-  console.log("Server running. Use our API on port: 3000")
-})
+
+const startServer = async () => {
+    try{
+        await connection;
+        console.log('Database connected');
+        app.listen(8000, () => {
+            console.log('Server started on http://localhost:8000');
+        });
+    } catch (err) {
+        console.log(err);
+        process.exit(1);
+    }
+}
+
+startServer();
