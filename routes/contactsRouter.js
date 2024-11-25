@@ -10,4 +10,4 @@ router.put('/:contactId', putContact);
 router.patch('/:contactId/favorite', patchContact);
 router.delete('/:contactId', removeContact);
 
-module.exports = router
+module.exports = router;
