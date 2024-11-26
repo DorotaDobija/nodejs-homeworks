@@ -9,7 +9,7 @@ const authMiddleware = (req, res, next) => {
             session: false,
         },
         (err, user) => {
-            if(!user || err) {
+            if(!user || err || user.token === null) {
                 return res.status(401).json({ message: "Not authorized"})
             }
 
