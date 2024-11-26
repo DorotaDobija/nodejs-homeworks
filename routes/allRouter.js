@@ -5,7 +5,7 @@ const authMiddleware = require('../JWT/middlewareJWT.js');
 
 const router = express.Router()
 
-router.use('/', authRouter)
+router.use('/users', authRouter)
 router.use('/contacts', authMiddleware, contactsRouter)
 
 module.exports = router;

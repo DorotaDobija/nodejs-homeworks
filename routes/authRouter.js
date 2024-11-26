@@ -11,17 +11,22 @@ const schema = Joi.object({
     password: Joi.string().min(8).max(20).regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,20}$/).required()
 }) 
 
-router.post('/users/signup', async (req, res, next) => {
-    const { email, password } = schema.validate(req.body);
+router.post('/signup', async (req, res, next) => {
+    
+    const { error, value } = schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: "Validation failed", details: error.details });
+    }
 
-    const user = await User.findOne({ email }, { _id: 1 }).lean();
+    const user = await User.findOne({ email: value.email });
+
 
     if(user) {
         return res.status(409).json({ message: "Email in use" });
     }
     try {
-        const newUser = new User({ email });
-        await newUser.setPassword(password);
+        const newUser = new User({ email: value.email });
+        await newUser.setPassword( value.password );
         await newUser.save();
         return res.status(201).json({
             "user": {
@@ -35,15 +40,18 @@ router.post('/users/signup', async (req, res, next) => {
 }
  );
 
-router.post('/users/login', async (req, res, next) => {
-    const { email, password } = schema.validate(req.body);
+router.post('/login', async (req, res, next) => {
+    const { error, value } = schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: "Validation failed", details: error.details });
+    }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: value.email });
 
     if(!user) {
         return res.status(400).json({ message: "There is no user with this email" });
     }
-    const isPasswordCorrect = await user.validatePassword(password);
+    const isPasswordCorrect = await user.validatePassword(value.password);
 
     if(isPasswordCorrect) {
         const payload = {
@@ -68,21 +76,23 @@ router.post('/users/login', async (req, res, next) => {
     }
 });
 
-router.post('/users/logout', authMiddleware, async (req, res, next) => { 
+router.post('/logout', authMiddleware, async (req, res, next) => { 
 
-    const userData = req.user;
+    const userData = res.locals.user;
+    console.log('Logged in user data:', userData)
     const user = await User.findOne({ _id: userData.id });
 
      if(!user) {
         return res.status(401).json({ message: "Not authorized" });
      } else {
+         console.log('Updating token to null');
          await User.updateOne({ _id: user.id }, { $set: { token: null } });
-         return res.status(204)
+         return res.status(204).send();
     }
 
 });
-router.post('/users/current', authMiddleware, async (req, res, next) => {
-    const userData = req.user;
+router.post('/current', authMiddleware, async (req, res, next) => {
+    const userData = res.locals.user;
     const user = await User.findOne({ _id: userData.id });
 
      if(!user) {

@@ -19,8 +19,12 @@ const userSchema = new mongoose.Schema({
   token: {
     type: String,
     default: null,
-  },
-})
+  }
+},
+    {
+    versionKey: false,
+    timestamps: true,
+    })
 
 userSchema.methods.setPassword = async function (password) {
     this.password = await bCrypt.hash(password, 10)
@@ -31,5 +35,6 @@ userSchema.methods.validatePassword = function (password) {
 };
 
 const User = mongoose.model('user', userSchema, 'user')
+
 
 module.exports = User;
