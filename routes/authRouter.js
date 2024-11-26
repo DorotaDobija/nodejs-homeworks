@@ -79,13 +79,11 @@ router.post('/login', async (req, res, next) => {
 router.post('/logout', authMiddleware, async (req, res, next) => { 
 
     const userData = res.locals.user;
-    console.log('Logged in user data:', userData)
     const user = await User.findOne({ _id: userData.id });
 
      if(!user) {
         return res.status(401).json({ message: "Not authorized" });
      } else {
-         console.log('Updating token to null');
          await User.updateOne({ _id: user.id }, { $set: { token: null } });
          return res.status(204).send();
     }

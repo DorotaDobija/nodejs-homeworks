@@ -14,7 +14,7 @@ const JWTStrategy = () => {
             params,
             async function(payload, done) {
                 try {
-                    const user = await User.findOne({_id: payload.id}).lean()
+                    const user = await User.findOne({ _id: payload.id });
                     if(!user) {
                         return done(new Error("User not found."))
                     }
