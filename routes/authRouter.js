@@ -89,7 +89,7 @@ router.post('/logout', authMiddleware, async (req, res, next) => {
     }
 
 });
-router.post('/current', authMiddleware, async (req, res, next) => {
+router.get('/current', authMiddleware, async (req, res, next) => {
     const userData = res.locals.user;
     const user = await User.findOne({ _id: userData.id });
 
