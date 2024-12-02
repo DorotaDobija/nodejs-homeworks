@@ -55,7 +55,6 @@ const putContact = async (req, res, next) => {
 
 const patchContact = async (req, res, next) => {
     const id = req.params.contactId;
-    console.log(typeof req.body.favorite)
     try {
         const result = await updateStatusContact({ id, favorite: req.body.favorite})
         if(req.body.favorite === undefined) {

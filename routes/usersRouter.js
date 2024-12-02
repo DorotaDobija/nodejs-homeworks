@@ -113,6 +113,6 @@ router.get('/current', authMiddleware, async (req, res, next) => {
 });
  
 
-router.patch('/avatars', uploadMiddleware.single('avatar'), updateAvatar);
+router.patch('/avatars', authMiddleware, uploadMiddleware.single('avatar'), updateAvatar);
 
 module.exports = router;

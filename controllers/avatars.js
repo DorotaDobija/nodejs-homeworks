@@ -16,21 +16,17 @@ const updateAvatar = async (req, res, next) => {
     const filePath = path.join(process.cwd(), 'public/avatars', fileName);
 
     try {
-        console.log(temporaryPath)
-        console.log(filePath)
         const isValidAndTransform = await isImageAndTransform(temporaryPath, filePath); 
         if (!isValidAndTransform) {
             await fs.unlink(temporaryPath);
             return res.status(400).json({ message: "File isn't a photo" });
         }
-
-
+    
         const user = await User.findByIdAndUpdate(
-            req.user.id, 
+            res.locals.user.id, 
             { avatarURL: `/avatars/${fileName}` },
             { new: true }
         );
-
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -38,6 +34,7 @@ const updateAvatar = async (req, res, next) => {
         res.status(200).json({
             "avatarURL": user.avatarURL
         });
+      
     } catch (error) {
         next(error);
     }
