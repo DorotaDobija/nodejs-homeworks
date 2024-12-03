@@ -4,6 +4,7 @@ const cors = require('cors');
 const allRouter = require('./routes/allRouter');
 const app = express();
 const JWTStrategy = require('./JWT/configJWT');
+const path = require("path");
 
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
@@ -11,6 +12,7 @@ const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
 app.use(logger(formatsLogger))
 app.use(cors())
 app.use(express.json())
+app.use(express.static(path.resolve(__dirname, "./public")));
 
 JWTStrategy();
 
@@ -27,5 +29,6 @@ app.use((err, req, res, next) => {
         res.status(500).json({ message: err.message || 'Something went wrong' });
     }
 })
+
 
 module.exports = app;

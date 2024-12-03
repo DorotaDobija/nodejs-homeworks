@@ -2,7 +2,10 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const Joi = require('joi');
-const authMiddleware = require('../JWT/middlewareJWT')
+const authMiddleware = require('../JWT/middlewareJWT');
+const gravatar = require('gravatar');
+const { updateAvatar } = require('../controllers/avatars');
+const { uploadMiddleware } = require('../Multer/configMulter');
 
 const router = express.Router();
 
@@ -25,20 +28,26 @@ router.post('/signup', async (req, res, next) => {
         return res.status(409).json({ message: "Email in use" });
     }
     try {
-        const newUser = new User({ email: value.email });
+        const newUser = new User({
+            email: value.email,
+            avatarURL: gravatar.url(value.email, { s: '200',r: 'pg',  d: 'retro' })
+         });
         await newUser.setPassword( value.password );
         await newUser.save();
         return res.status(201).json({
             "user": {
                 "email": newUser.email,
-                "subscription": newUser.subscription
+                "subscription": newUser.subscription,
+                "avatarURL": newUser.avatarURL
+
         }
         });
     } catch (error) {
         next(error);
     }
 }
- );
+);
+
 
 router.post('/login', async (req, res, next) => {
     const { error, value } = schema.validate(req.body);
@@ -101,6 +110,9 @@ router.get('/current', authMiddleware, async (req, res, next) => {
             "subscription": user.subscription
          })
     }
- });
+});
+ 
+
+router.patch('/avatars', authMiddleware, uploadMiddleware.single('avatar'), updateAvatar);
 
 module.exports = router;
