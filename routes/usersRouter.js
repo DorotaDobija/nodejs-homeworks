@@ -6,6 +6,9 @@ const authMiddleware = require('../JWT/middlewareJWT');
 const gravatar = require('gravatar');
 const { updateAvatar } = require('../controllers/avatars');
 const { uploadMiddleware } = require('../Multer/configMulter');
+const { verifyUser, resendingVerifyEmail } = require('../controllers/verify');
+const { emailSender } = require('../Email/email');
+const { v4: uuidV4 } = require('uuid');
 
 const router = express.Router();
 
@@ -30,9 +33,11 @@ router.post('/signup', async (req, res, next) => {
     try {
         const newUser = new User({
             email: value.email,
-            avatarURL: gravatar.url(value.email, { s: '200',r: 'pg',  d: 'retro' })
+            avatarURL: gravatar.url(value.email, { s: '200', r: 'pg', d: 'retro' }),
+            verificationToken: uuidV4()
          });
-        await newUser.setPassword( value.password );
+        await newUser.setPassword(value.password);
+        await emailSender(`<h1>Hello</h1><p>Verify your email by clicking the link below</p><a href="http://localhost:3000/api/users/verify/${newUser.verificationToken}">Verify link</a>`, 'Verify message', newUser.email)
         await newUser.save();
         return res.status(201).json({
             "user": {
@@ -60,6 +65,11 @@ router.post('/login', async (req, res, next) => {
     if(!user) {
         return res.status(400).json({ message: "There is no user with this email" });
     }
+
+      if(!user.verify) {
+        return res.status(400).json({ message: "Verify your email" });
+    }
+
     const isPasswordCorrect = await user.validatePassword(value.password);
 
     if(isPasswordCorrect) {
@@ -114,5 +124,7 @@ router.get('/current', authMiddleware, async (req, res, next) => {
  
 
 router.patch('/avatars', authMiddleware, uploadMiddleware.single('avatar'), updateAvatar);
+router.get('/verify/:verificationToken', verifyUser)
+router.post('/verify', resendingVerifyEmail)
 
 module.exports = router;
