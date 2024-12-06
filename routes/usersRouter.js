@@ -65,6 +65,11 @@ router.post('/login', async (req, res, next) => {
     if(!user) {
         return res.status(400).json({ message: "There is no user with this email" });
     }
+
+      if(!user.verify) {
+        return res.status(400).json({ message: "Verify your email" });
+    }
+
     const isPasswordCorrect = await user.validatePassword(value.password);
 
     if(isPasswordCorrect) {
